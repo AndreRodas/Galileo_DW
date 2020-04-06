@@ -1,3 +1,5 @@
+#Autor: Andre Rodas
+
 # -- 1. Considerando las reglas de normalización, ¿Qué mejoras podría realizar en las tablas?
 
 # Le asignaria una llave foranea para conectar la tabla RANGO_SUELDO con EMPLEADO. El atributo CARGO de EMPLEADO lo volvería tabla.

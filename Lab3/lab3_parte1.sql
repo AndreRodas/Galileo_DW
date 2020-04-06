@@ -1,4 +1,4 @@
-#Autor: André Rodas
+#Autor: Andre Rodas
 
 DROP DATABASE IF EXISTS clase;
 CREATE DATABASE clase;
