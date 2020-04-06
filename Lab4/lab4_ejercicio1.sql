@@ -1,6 +1,6 @@
 -- Autor: Andre Rodas
 -- SQL engine: SQLite
-    
+
 VACUUM;
 
 DROP TABLE friend;
@@ -33,22 +33,22 @@ CONSTRAINT fk_id2_likes FOREIGN KEY (ID2)
         REFERENCES highschooler(ID)
 );
 
--- Inciso 1
+-- ************** Inciso 1 *******************
 
-CREATE TRIGGER FRIEND_DEL 
+CREATE TRIGGER FRIEND_DEL
 AFTER DELETE ON Friend
-FOR EACH ROW WHEN EXISTS 
-(SELECT * FROM Friend WHERE ID1 = OLD.ID2 AND ID2 = OLD.ID1) 
-BEGIN 
-DELETE FROM Friend WHERE (ID1 = OLD.ID2 AND ID2 = OLD.ID1); 
+FOR EACH ROW WHEN EXISTS
+(SELECT * FROM Friend WHERE ID1 = OLD.ID2 AND ID2 = OLD.ID1)
+BEGIN
+DELETE FROM Friend WHERE (ID1 = OLD.ID2 AND ID2 = OLD.ID1);
 END;
 
 
-CREATE TRIGGER FRIEND_ADD_SYM 
+CREATE TRIGGER FRIEND_ADD_SYM
 AFTER INSERT ON Friend
-FOR EACH ROW WHEN NOT EXISTS 
-(SELECT * FROM Friend WHERE ID1 = NEW.ID2 AND ID2 = NEW.ID1) 
-BEGIN 
+FOR EACH ROW WHEN NOT EXISTS
+(SELECT * FROM Friend WHERE ID1 = NEW.ID2 AND ID2 = NEW.ID1)
+BEGIN
     INSERT INTO Friend VALUES (NEW.ID2, NEW.ID1);
 END;
 
@@ -66,22 +66,22 @@ select * from friend;
 -- Prueba Borrar
 delete from friend where id1='2';
 select * from friend;
- 
 
 
--- Inciso 2
+
+-- ************** Inciso 2 *******************
 CREATE TRIGGER GRADUACIÓN
 AFTER UPDATE OF grade ON Highschooler
-FOR EACH ROW WHEN NEW.grade > 12 
-BEGIN 
-DELETE FROM Highschooler WHERE (ID = NEW.ID); 
+FOR EACH ROW WHEN NEW.grade > 12
+BEGIN
+DELETE FROM Highschooler WHERE (ID = NEW.ID);
 END;
 
 CREATE TRIGGER NUEVO_GRADO
 AFTER UPDATE OF grade ON Highschooler
-FOR EACH ROW WHEN NEW.grade = OLD.grade + 1 
-BEGIN 
-    UPDATE Highschooler SET grade = new.grade WHERE ID IN (SELECT DISTINCT ID2 FROM Friend WHERE ID1 = NEW.ID); 
+FOR EACH ROW WHEN NEW.grade = OLD.grade + 1
+BEGIN
+    UPDATE Highschooler SET grade = new.grade WHERE ID IN (SELECT DISTINCT ID2 FROM Friend WHERE ID1 = NEW.ID);
 END;
 
 -- Inserts
@@ -102,17 +102,21 @@ select * from highschooler;
 update highschooler set grade = 13 where id=4;
 select * from highschooler;
 
--- Inciso 3
+-- ************** Inciso 3 *******************
 CREATE TRIGGER NOES_AMIGO
 AFTER UPDATE OF ID2 ON Likes
 FOR EACH ROW WHEN (Old.ID1 = New.ID1 and Old.ID2 <> New.ID2)
-BEGIN 
+BEGIN
 delete from Friend where (Friend.ID1 = Old.ID2 and Friend.ID2 = New.ID2)
  or (Friend.ID1 = New.ID2 and Friend.ID2 = Old.ID2);
 END;
 
--- Inciso 4
+-- ************** Inciso 4 *******************
 
-
-
-
+CREATE TEMP TABLE IF NOT EXISTS Variables (myID INT);
+INSERT OR REPLACE INTO Variables VALUES (3); -- Ingresar numero
+SELECT
+(SELECT DISTINCT COUNT(ID2) FROM Friend WHERE ID1=(select myID from Variables))
+'No. Amigos',
+(SELECT DISTINCT COUNT(ID2) FROM Likes WHERE ID1=(select myID from Variables))
+ 'No. Likes';
